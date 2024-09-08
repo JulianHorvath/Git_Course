@@ -1,0 +1,76 @@
+CREATE MATERIALIZED VIEW IF NOT EXISTS gadp_scratch.ota_jhorvath.sgw
+COMMENT 'SGW and tight ECUs source for Americas Power BI Dashboard'
+PARTITIONED BY (sw_version_SGW,scomo_id_SGW)
+SCHEDULE CRON '0 0 22 * * ? *' AT TIME ZONE 'America/Buenos_Aires'
+AS
+with sgw as (
+  select
+    vin,
+    right(sw_version,16) as sw_version_SGW,
+    scomo_id as scomo_id_SGW,
+    last_seen as last_update_SGW
+  from ods.fota.sw_inventory_report_last_known
+  where scomo_id like 'SGW%' and sw_version is not null and last_seen like '____-__-__%' and vin is not null
+),
+cadm as (
+  select
+    vin,
+    sw_version as sw_version_CADM,
+    scomo_id as scomo_id_CADM,
+    last_seen as last_update_CADM
+  from ods.fota.sw_inventory_report_last_known
+  where scomo_id like 'CADM%' and sw_version is not null and last_seen like '____-__-__%' and vin is not null
+),
+spaak as (
+  select
+    vin,
+    right(sw_version,5) as sw_version_SPAAK,
+    scomo_id as scomo_id_SPAAK,
+    last_seen as last_update_SPAAK
+  from ods.fota.sw_inventory_report_last_known
+  where scomo_id like '%SPAAK%' and sw_version is not null and last_seen like '____-__-__%' and vin is not null
+),
+adcam as (
+  select
+    vin,
+    sw_version as sw_version_ADCAM,
+    scomo_id as scomo_id_ADCAM,
+    last_seen as last_update_ADCAM
+  from ods.fota.sw_inventory_report_last_known
+  where scomo_id like 'ADCAM%' and sw_version is not null and last_seen like '____-__-__%' and vin is not null
+),
+ecmmg as (
+  select
+    vin,
+    sw_version as sw_version_ECMMG,
+    scomo_id as scomo_id_ECMMG,
+    last_seen as last_update_ECMMG
+  from ods.fota.sw_inventory_report_last_known
+  where scomo_id like 'ECMMG%' and sw_version is not null and last_seen like '____-__-__%' and vin is not null
+)    
+select
+trim(trailing '_SGW' from t1.vin) as vin,
+t1.sw_version_SGW,
+t1.scomo_id_SGW,
+t1.last_update_SGW,
+t2.sw_version_CADM,
+t2.scomo_id_CADM,
+t2.last_update_CADM,
+t3.sw_version_SPAAK,
+t3.scomo_id_SPAAK,
+t3.last_update_SPAAK,
+t4.sw_version_ADCAM,
+t4.scomo_id_ADCAM,
+t4.last_update_ADCAM,
+t5.sw_version_ECMMG,
+t5.scomo_id_ECMMG,
+t5.last_update_ECMMG
+from sgw t1
+left join cadm t2
+on t1.vin = t2.vin
+left join spaak t3
+on t1.vin = t3.vin
+left join adcam t4
+on t1.vin = t4.vin
+left join ecmmg t5
+on t1.vin = t5.vin

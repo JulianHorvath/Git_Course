@@ -1,0 +1,11 @@
+Kilometers = 
+var Lat1 = MIN('Dealer Mapping'[Latitude])
+var Lng1 = MIN('Dealer Mapping'[Longitude])
+
+var Lat2 = CALCULATE(MIN('Dealer Mapping'[Latitude]),'Dealer Mapping'[N_CITY]="1000 CHRYSLER DRIVE")
+var Lng2 = CALCULATE(MIN('Dealer Mapping'[Longitude]),'Dealer Mapping'[N_CITY]="1000 CHRYSLER DRIVE")
+
+var P = DIVIDE(PI(),180)
+var A = 0.5 - COS((Lat2-Lat1) * P)/2 + COS(Lat1 * P) * COS(lat2 * P) * (1-COS((Lng2- Lng1) * P))/2
+var final = 12742 * ASIN((SQRT(A)))
+return final

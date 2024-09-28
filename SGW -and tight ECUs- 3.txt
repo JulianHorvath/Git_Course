@@ -1,5 +1,5 @@
 CREATE MATERIALIZED VIEW IF NOT EXISTS gadp_scratch.ota_jhorvath.sgw
-COMMENT 'Version 18 for SGW and tight ECUs source for Americas Power BI Dashboard'
+'La gente de MASTER for SGW and tight ECUs source for Americas Power BI Dashboard'
 PARTITIONED BY (sw_version_SGW,scomo_id_SGW)
 SCHEDULE CRON '0 0 22 * * ? *' AT TIME ZONE 'America/Buenos_Aires'
 AS
